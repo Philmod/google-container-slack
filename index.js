@@ -10,7 +10,7 @@ module.exports.getGithubCommit = async (build, octokit) => {
   try {
     let githubOwner;
     let githubRepo;
-    if (build.source.repoSource) { // mirrored repo triggered build
+    if (build.source && build.source.repoSource) { // mirrored repo triggered build
       const cloudSourceRepo = build.source.repoSource.repoName;
       [, githubOwner, githubRepo] = cloudSourceRepo.split('_');
     } else { // github app triggered build
