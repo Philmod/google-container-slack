@@ -16,6 +16,10 @@ export PROJECT_ID=my-project-id
 ```
 export GITHUB_TOKEN=my-token
 ```
+For [github app triggers](https://cloud.google.com/cloud-build/docs/create-github-app-triggers), the github owner will also need to be specified.
+```
+export GITHUB_OWNER=my-github-owner
+```
 4. [Optionally] Set the status you want a message for, here are the default ones:
 ```
 export GC_SLACK_STATUS="SUCCESS FAILURE TIMEOUT INTERNAL_ERROR"
@@ -93,4 +97,11 @@ In the case where a `BUCKET_NAME` is not defined, a random one is generated. And
 
 ### What are the limitations of using github token to get github commit author info?
 
-For github commit author info to be displayed, the cloud source repositories must be in the form of `github_<OWNER>_<REPO>` and there cannot be underscores in either `<OWNER>` or `<REPO>`. A possible solution to bypass this limitation would be to retrieve owner and repo info directly from [GitHubEventsConfig](https://cloud.google.com/cloud-build/docs/api/reference/rest/v1/projects.triggers#githubeventsconfig).
+#### If using mirrored repos
+
+For github commit author info to be displayed, the cloud source repositories must be in the form of `github_<OWNER>_<REPO>` and there cannot be underscores in either `<OWNER>` or `<REPO>`.
+
+#### If using GitHub app triggers
+
+The repo owner is not available in the build itself. The current solution is to provide it as an environment variable.
+A possible solution to bypass this limitation would be to retrieve owner and repo info directly from [GitHubEventsConfig](https://cloud.google.com/cloud-build/docs/api/reference/rest/v1/projects.triggers#githubeventsconfig), this would require fetching info form the build's trigger.
