@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const Octokit = require('@octokit/rest');
 const lib = require('./index.js');
 
-const base64Build = 'eyJpZCI6IjE3NDBjZTJhLTYxZDktNGE1OC1iM2M3LWNmYWQ5OWRiOGQwYSIsInByb2plY3RJZCI6Im5vZGUtZXhhbXBsZS1na2UiLCJzdGF0dXMiOiJTVUNDRVNTIiwic291cmNlIjp7InJlcG9Tb3VyY2UiOnsicHJvamVjdElkIjoibm9kZS1leGFtcGxlLWdrZSIsInJlcG9OYW1lIjoibm9kZS1leGFtcGxlLWZyb250ZW5kIiwiYnJhbmNoTmFtZSI6Im1hc3RlciJ9fSwic3RlcHMiOlt7Im5hbWUiOiJnY3IuaW8vY2xvdWQtYnVpbGRlcnMvZG9ja2VyIiwiYXJncyI6WyJidWlsZCIsIi10IiwiZ2NyLmlvL25vZGUtZXhhbXBsZS1na2UvZnJvbnRlbmQ6NDg5OTFiNGE3Yjc0MThhMzVkMDBlZGVkMDI4YWUxZmMwNmE0ZmM3NSIsIi4iXX1dLCJyZXN1bHRzIjp7ImltYWdlcyI6W3sibmFtZSI6Imdjci5pby9ub2RlLWV4YW1wbGUtZ2tlL2Zyb250ZW5kOjQ4OTkxYjRhN2I3NDE4YTM1ZDAwZWRlZDAyOGFlMWZjMDZhNGZjNzUiLCJkaWdlc3QiOiJzaGEyNTY6ZDgyMTMyZDlmYTc4NTllNDA4NWFhZThhZjJlZmY2MmZhM2Q1MDhkYjlhOGZkNDE2OWVlN2I2MThkM2YzMjZkNyJ9XSwiYnVpbGRTdGVwSW1hZ2VzIjpbInNoYTI1NjpmYmRiNTBhMmQ5ZDkzOTE2YWUwMTkzYWJmZDQ3OTZmNGI1ODAxNDNmNjBhOTQwNmU1NDY5MDZjOWJiZTc2OGEwIl19LCJjcmVhdGVUaW1lIjoiMjAxNy0wMy0xOVQwMDowNzoyMC4zNTQyMjNaIiwic3RhcnRUaW1lIjoiMjAxNy0wMy0xOVQwMDowNzoyMS4xNTQ0NDI0NjNaIiwiZmluaXNoVGltZSI6IjIwMTctMDMtMTlUMDA6MDg6MTIuMjIwNTAyWiIsInRpbWVvdXQiOiI2MDAuMDAwcyIsImltYWdlcyI6WyJnY3IuaW8vbm9kZS1leGFtcGxlLWdrZS9mcm9udGVuZDo0ODk5MWI0YTdiNzQxOGEzNWQwMGVkZWQwMjhhZTFmYzA2YTRmYzc1Il0sInNvdXJjZVByb3ZlbmFuY2UiOnsicmVzb2x2ZWRSZXBvU291cmNlIjp7InByb2plY3RJZCI6Im5vZGUtZXhhbXBsZS1na2UiLCJyZXBvTmFtZSI6Im5vZGUtZXhhbXBsZS1mcm9udGVuZCIsImNvbW1pdFNoYSI6IjQ4OTkxYjRhN2I3NDE4YTM1ZDAwZWRlZDAyOGFlMWZjMDZhNGZjNzUifX0sImJ1aWxkVHJpZ2dlcklkIjoiNjg2ZjljMzUtMzdjNy00MzJiLWFlOGYtYzQ0MGUwY2M0MDg5IiwibG9nVXJsIjoiaHR0cHM6Ly9jb25zb2xlLmRldmVsb3BlcnMuZ29vZ2xlLmNvbS9sb2dzL3ZpZXdlcj9wcm9qZWN0PW5vZGUtZXhhbXBsZS1na2VcdTAwMjZyZXNvdXJjZS5sYWJlbHMuYnVpbGRfaWQ9MTc0MGNlMmEtNjFkOS00YTU4LWIzYzctY2ZhZDk5ZGI4ZDBhIn0=';
+const base64Build = 'eyJpZCI6IjE3NDBjZTJhLTYxZDktNGE1OC1iM2M3LWNmYWQ5OWRiOGQwYSIsInN1YnN0aXR1dGlvbnMiOnsiQlJBTkNIX05BTUUiOiJtYXN0ZXIiLCJDT01NSVRfU0hBIjoiNDg5OTFiNGE3Yjc0MThhMzVkMDBlZGVkMDI4YWUxZmMwNmE0ZmM3NSIsIlJFUE9fTkFNRSI6Im5vZGUtZXhhbXBsZS1mcm9udGVuZCJ9LCJwcm9qZWN0SWQiOiJub2RlLWV4YW1wbGUtZ2tlIiwic3RhdHVzIjoiU1VDQ0VTUyIsInNvdXJjZSI6eyJyZXBvU291cmNlIjp7InByb2plY3RJZCI6Im5vZGUtZXhhbXBsZS1na2UiLCJyZXBvTmFtZSI6Im5vZGUtZXhhbXBsZS1mcm9udGVuZCIsImJyYW5jaE5hbWUiOiJtYXN0ZXIifX0sInN0ZXBzIjpbeyJuYW1lIjoiZ2NyLmlvL2Nsb3VkLWJ1aWxkZXJzL2RvY2tlciIsImFyZ3MiOlsiYnVpbGQiLCItdCIsImdjci5pby9ub2RlLWV4YW1wbGUtZ2tlL2Zyb250ZW5kOjQ4OTkxYjRhN2I3NDE4YTM1ZDAwZWRlZDAyOGFlMWZjMDZhNGZjNzUiLCIuIl19XSwicmVzdWx0cyI6eyJpbWFnZXMiOlt7Im5hbWUiOiJnY3IuaW8vbm9kZS1leGFtcGxlLWdrZS9mcm9udGVuZDo0ODk5MWI0YTdiNzQxOGEzNWQwMGVkZWQwMjhhZTFmYzA2YTRmYzc1IiwiZGlnZXN0Ijoic2hhMjU2OmQ4MjEzMmQ5ZmE3ODU5ZTQwODVhYWU4YWYyZWZmNjJmYTNkNTA4ZGI5YThmZDQxNjllZTdiNjE4ZDNmMzI2ZDcifV0sImJ1aWxkU3RlcEltYWdlcyI6WyJzaGEyNTY6ZmJkYjUwYTJkOWQ5MzkxNmFlMDE5M2FiZmQ0Nzk2ZjRiNTgwMTQzZjYwYTk0MDZlNTQ2OTA2YzliYmU3NjhhMCJdfSwiY3JlYXRlVGltZSI6IjIwMTctMDMtMTlUMDA6MDc6MjAuMzU0MjIzWiIsInN0YXJ0VGltZSI6IjIwMTctMDMtMTlUMDA6MDc6MjEuMTU0NDQyNDYzWiIsImZpbmlzaFRpbWUiOiIyMDE3LTAzLTE5VDAwOjA4OjEyLjIyMDUwMloiLCJ0aW1lb3V0IjoiNjAwLjAwMHMiLCJpbWFnZXMiOlsiZ2NyLmlvL25vZGUtZXhhbXBsZS1na2UvZnJvbnRlbmQ6NDg5OTFiNGE3Yjc0MThhMzVkMDBlZGVkMDI4YWUxZmMwNmE0ZmM3NSJdLCJzb3VyY2VQcm92ZW5hbmNlIjp7InJlc29sdmVkUmVwb1NvdXJjZSI6eyJwcm9qZWN0SWQiOiJub2RlLWV4YW1wbGUtZ2tlIiwicmVwb05hbWUiOiJub2RlLWV4YW1wbGUtZnJvbnRlbmQiLCJjb21taXRTaGEiOiI0ODk5MWI0YTdiNzQxOGEzNWQwMGVkZWQwMjhhZTFmYzA2YTRmYzc1In19LCJidWlsZFRyaWdnZXJJZCI6IjY4NmY5YzM1LTM3YzctNDMyYi1hZThmLWM0NDBlMGNjNDA4OSIsImxvZ1VybCI6Imh0dHBzOi8vY29uc29sZS5kZXZlbG9wZXJzLmdvb2dsZS5jb20vbG9ncy92aWV3ZXI/cHJvamVjdD1ub2RlLWV4YW1wbGUtZ2tlJnJlc291cmNlLmxhYmVscy5idWlsZF9pZD0xNzQwY2UyYS02MWQ5LTRhNTgtYjNjNy1jZmFkOTlkYjhkMGEifQo=';
 const base64BuildDefaultTrigger = 'eyJpZCI6IjE3NDBjZTJhLTYxZDktNGE1OC1iM2M3LWNmYWQ5OWRiOGQwYSIsInByb2plY3RJZCI6Im5vZGUtZXhhbXBsZS1na2UiLCJzdGF0dXMiOiJTVUNDRVNTIiwic291cmNlIjp7InN0b3JhZ2VTb3VyY2UiOnsiYnVja2V0Ijoibm9kZS1leGFtcGxlLWJ1Y2tldCIsIm9iamVjdCI6Im5vZGUtZXhhbXBsZS1vYmplY3QudGFyLmd6In19LCJzdGVwcyI6W3sibmFtZSI6Imdjci5pby9jbG91ZC1idWlsZGVycy9kb2NrZXIiLCJhcmdzIjpbImJ1aWxkIiwiLXQiLCJnY3IuaW8vbm9kZS1leGFtcGxlLWdrZS9mcm9udGVuZDo0ODk5MWI0YTdiNzQxOGEzNWQwMGVkZWQwMjhhZTFmYzA2YTRmYzc1IiwiLiJdfV0sInJlc3VsdHMiOnsiaW1hZ2VzIjpbeyJuYW1lIjoiZ2NyLmlvL25vZGUtZXhhbXBsZS1na2UvZnJvbnRlbmQ6NDg5OTFiNGE3Yjc0MThhMzVkMDBlZGVkMDI4YWUxZmMwNmE0ZmM3NSIsImRpZ2VzdCI6InNoYTI1NjpkODIxMzJkOWZhNzg1OWU0MDg1YWFlOGFmMmVmZjYyZmEzZDUwOGRiOWE4ZmQ0MTY5ZWU3YjYxOGQzZjMyNmQ3In1dLCJidWlsZFN0ZXBJbWFnZXMiOlsic2hhMjU2OmZiZGI1MGEyZDlkOTM5MTZhZTAxOTNhYmZkNDc5NmY0YjU4MDE0M2Y2MGE5NDA2ZTU0NjkwNmM5YmJlNzY4YTAiXX0sImNyZWF0ZVRpbWUiOiIyMDE3LTAzLTE5VDAwOjA3OjIwLjM1NDIyM1oiLCJzdGFydFRpbWUiOiIyMDE3LTAzLTE5VDAwOjA3OjIxLjE1NDQ0MjQ2M1oiLCJmaW5pc2hUaW1lIjoiMjAxNy0wMy0xOVQwMDowODoxMi4yMjA1MDJaIiwidGltZW91dCI6IjYwMC4wMDBzIiwiaW1hZ2VzIjpbImdjci5pby9ub2RlLWV4YW1wbGUtZ2tlL2Zyb250ZW5kOjQ4OTkxYjRhN2I3NDE4YTM1ZDAwZWRlZDAyOGFlMWZjMDZhNGZjNzUiXSwic291cmNlUHJvdmVuYW5jZSI6eyJyZXNvbHZlZFJlcG9Tb3VyY2UiOnsicHJvamVjdElkIjoibm9kZS1leGFtcGxlLWdrZSIsInJlcG9OYW1lIjoibm9kZS1leGFtcGxlLWZyb250ZW5kIiwiY29tbWl0U2hhIjoiNDg5OTFiNGE3Yjc0MThhMzVkMDBlZGVkMDI4YWUxZmMwNmE0ZmM3NSJ9fSwiYnVpbGRUcmlnZ2VySWQiOiJkZWZhdWx0LWdpdGh1Yi1jaGVja3MiLCJsb2dVcmwiOiJodHRwczovL2NvbnNvbGUuZGV2ZWxvcGVycy5nb29nbGUuY29tL2xvZ3Mvdmlld2VyP3Byb2plY3Q9bm9kZS1leGFtcGxlLWdrZVx1MDAyNnJlc291cmNlLmxhYmVscy5idWlsZF9pZD0xNzQwY2UyYS02MWQ5LTRhNTgtYjNjNy1jZmFkOTlkYjhkMGEiLCJzdWJzdGl0dXRpb25zIjp7IkJSQU5DSF9OQU1FIjoibWFzdGVyIiwiQ09NTUlUX1NIQSI6Im40ODk5MWI0YTdiNzQxOGEzNWQwMGVkZWQwMjhhZTFmYzA2YTRmYzc1IiwiUkVQT19OQU1FIjoibm9kZS1leGFtcGxlLWZyb250ZW5kIiwiUkVWSVNJT05fSUQiOiI0ODk5MWI0YTdiNzQxOGEzNWQwMGVkZWQwMjhhZTFmYzA2YTRmYzc1IiwiU0hPUlRfU0hBIjoiNDg5OTFiNGEiLCJUQUdfTkFNRSI6IiJ9LCJ0YWdzIjpbInRyaWdnZXItZGVmYXVsdC1naXRodWItY2hlY2tzIl19Cg==';
 const nbCommonFields = 2;
 const MS_PER_MINUTE = 60000;
@@ -26,6 +26,9 @@ describe('createSlackMessage', () => {
       status: 'SUCCESS',
       finishTime: '2017-03-19T00:08:12.220502Z',
       source: {},
+      substitutions: {
+        REPO_NAME: 'horse',
+      },
     };
     const message = await lib.createSlackMessage(build);
 
@@ -47,6 +50,9 @@ describe('createSlackMessage', () => {
       startTime: '2017-03-19T00:08:12.220502Z',
       finishTime: null,
       source: {},
+      substitutions: {
+        REPO_NAME: 'horse',
+      },
     };
 
     const message = await lib.createSlackMessage(build);
@@ -71,6 +77,9 @@ describe('createSlackMessage', () => {
       startTime: new Date(now - deltaInMinutes * MS_PER_MINUTE),
       finishTime: now,
       source: {},
+      substitutions: {
+        REPO_NAME: 'horse',
+      },
     };
     const message = await lib.createSlackMessage(build);
 
@@ -88,6 +97,9 @@ describe('createSlackMessage', () => {
       startTime: new Date(now - deltaInMinutes * MS_PER_MINUTE),
       finishTime: null,
       source: {},
+      substitutions: {
+        REPO_NAME: 'horse',
+      },
     };
     const message = await lib.createSlackMessage(build);
 
@@ -103,6 +115,9 @@ describe('createSlackMessage', () => {
       finishTime: Date.now(),
       images: ['image-1', 'image-2'],
       source: {},
+      substitutions: {
+        REPO_NAME: 'horse',
+      },
     };
     const message = await lib.createSlackMessage(build);
 
@@ -119,9 +134,28 @@ describe('createSlackMessage', () => {
     attachment.fields[3].value.should.equal('master');
   });
 
-  it('should include the commit author in the message if a github commit is retrieved', async () => {
+  it('should include the commit author in the message if a github commit is retrieved for mirrored repo triggered build', async () => {
     const build = lib.eventToBuild(base64Build);
-    build.source.repoSource.repoName = 'github_artofwar_chapter1';
+    const octokit = new Octokit({
+      auth: 'token sjhfgsa',
+    });
+    const stub = sinon.stub(octokit.git, 'getCommit')
+      .returns({
+        data: {
+          author: {
+            name: 'Sun Tzu',
+          },
+        },
+      });
+    const githubCommit = await lib.getGithubCommit(build, octokit);
+    const message = await lib.createSlackMessage(build, githubCommit);
+    const attachment = message.attachments[0];
+    attachment.fields[4].value.should.equal('Sun Tzu');
+    stub.reset();
+  });
+
+  it('should include the commit author in the message if a github commit is retrieved for github app triggered build', async () => {
+    const build = lib.eventToBuild(base64BuildDefaultTrigger);
     const octokit = new Octokit({
       auth: 'token sjhfgsa',
     });
@@ -149,10 +183,8 @@ describe('createSlackMessage', () => {
   });
 
   it('should use the right color depending on the status', () => {
-    const build = {
-      id: 'build-id',
-      finishTime: Date.now(),
-    };
+    const build = lib.eventToBuild(base64BuildDefaultTrigger);
+
     const testCases = [
       {
         status: 'QUEUED',
@@ -295,7 +327,7 @@ describe('subscribe', () => {
         doneEach();
       });
     }, () => {
-      // clean the status list.
+    // clean the status list.
       lib.GC_SLACK_STATUS = null;
     });
   });
@@ -340,7 +372,7 @@ describe('subscribe', () => {
         doneEach();
       });
     }, () => {
-      // clean the status list.
+    // clean the status list.
       lib.GC_SLACK_STATUS = null;
     });
   });

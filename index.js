@@ -8,11 +8,17 @@ module.exports.status = config.GC_SLACK_STATUS;
 
 module.exports.getGithubCommit = async (build, octokit) => {
   try {
-    const cloudSourceRepo = build.source.repoSource.repoName;
-    const { commitSha } = build.sourceProvenance.resolvedRepoSource;
+    let githubOwner;
+    let githubRepo;
+    if (build.source && build.source.repoSource) { // mirrored repo triggered build
+      const cloudSourceRepo = build.source.repoSource.repoName;
+      [, githubOwner, githubRepo] = cloudSourceRepo.split('_');
+    } else { // github app triggered build
+      githubOwner = process.env.GITHUB_OWNER;
+      githubRepo = build.substitutions.REPO_NAME;
+    }
 
-    // format github_ownerName_repoName
-    const [, githubOwner, githubRepo] = cloudSourceRepo.split('_');
+    const commitSha = build.substitutions.COMMIT_SHA;
 
     // get github commit
     const githubCommit = await octokit.git.getCommit({
@@ -108,25 +114,16 @@ module.exports.createSlackMessage = async (build, githubCommit) => {
     ],
   };
 
-  let repoName, branchName;
-  if (build.source && build.source.repoSource) {
-    ({ repoName, branchName } = build.source.repoSource);
-  }
-  else if (build.substitutions) {
-    repoName = build.substitutions.REPO_NAME;
-    branchName = build.substitutions.BRANCH_NAME;
-  }
-
   // Add source information to the message.
-  if (repoName && branchName) {
+  if (build.substitutions && build.substitutions.REPO_NAME && build.substitutions.BRANCH_NAME) {
     message.attachments[0].fields.push({
       title: 'Repository',
-      value: repoName,
+      value: build.substitutions.REPO_NAME,
     });
 
     message.attachments[0].fields.push({
       title: 'Branch',
-      value: branchName,
+      value: build.substitutions.BRANCH_NAME,
     });
 
     if (githubCommit) {
